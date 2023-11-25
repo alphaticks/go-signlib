@@ -9,4 +9,4 @@ Use the makefile to build the library
 
 **make library**    will compile the Rust library
 
-Store the library file in desired location, and set STARKLIB_PATH to the location of the library file when using the package
+Store the library file in desired location, and then use ecdsa.Load(path) before using the package
