@@ -13,27 +13,26 @@ typedef struct {
 } ExtendedSignatureC;
 
 // Function pointer type for sign_ecdsa
-typedef void (*sign_ecdsa_type)(const void*, const void*, ExtendedSignatureC*);
+typedef int32_t (*sign_ecdsa_type)(const void*, const void*, ExtendedSignatureC*);
 
 // Wrapper function to call sign_ecdsa
-void sign_ecdsa(void* f, const void* private_key, const void* message, ExtendedSignatureC* output) {
-    ((sign_ecdsa_type) f)(private_key, message, output);
+int32_t sign_ecdsa(void* f, const void* private_key, const void* message, ExtendedSignatureC* output) {
+    return ((sign_ecdsa_type) f)(private_key, message, output);
 }
 */
 import "C"
 import (
 	"fmt"
 	"math/big"
-	"os"
 	"unsafe"
 )
 
-var signEcdsaPtr *C.void
+var signEcdsaPtr unsafe.Pointer
 
-func init() {
-	handle := C.dlopen(C.CString(os.Getenv("STARKLIB_PATH")), C.RTLD_LAZY)
+func Load(path string) {
+	handle := C.dlopen(C.CString(path), C.RTLD_LAZY)
 	if handle == nil {
-		panic(fmt.Sprintf("failed to load the library: %s", os.Getenv("STARKLIB_PATH")))
+		panic(fmt.Sprintf("failed to load the library: %s", path))
 	}
 	signEcdsaPtr = C.dlsym(handle, C.CString("sign_ecdsa"))
 	if signEcdsaPtr == nil {
@@ -41,12 +40,18 @@ func init() {
 	}
 }
 
-func Sign(msgHash, privKey *big.Int) (x, y *big.Int, err error) {
+func Sign(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
+	if signEcdsaPtr == nil {
+		return nil, nil, fmt.Errorf("library not loaded")
+	}
 	var signature C.ExtendedSignatureC
 	privKeyBytes := privKey.FillBytes(make([]byte, 32))
 	msgHashBytes := msgHash.FillBytes(make([]byte, 32))
-	C.sign_ecdsa(signEcdsaPtr, unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), &signature)
-	x = new(big.Int).SetBytes((*[32]byte)(signature.r)[:])
-	y = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
+	res := C.sign_ecdsa(signEcdsaPtr, unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), &signature)
+	if res != 0 {
+		return nil, nil, fmt.Errorf("failed to sign")
+	}
+	r = new(big.Int).SetBytes((*[32]byte)(signature.r)[:])
+	s = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
 	return
 }

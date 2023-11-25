@@ -29,9 +29,12 @@ pub extern "C" fn sign_ecdsa(
         Ok(signature) => {
             // Convert signature to C compatible type and write to output
             // Assuming ExtendedSignature has a way to be converted to ExtendedSignatureC
+            let r_bytes = signature.r.to_bytes_be();
+            let s_bytes = signature.s.to_bytes_be();
+
             let signature_c = ExtendedSignatureC {
-                r: &signature.r as *const _ as *const c_void,
-                s: &signature.s as *const _ as *const c_void,
+                r: r_bytes.as_ptr() as *const c_void,
+                s: s_bytes.as_ptr() as *const c_void,
                 v: 0,
             };
 
