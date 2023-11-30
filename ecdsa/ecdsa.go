@@ -23,7 +23,7 @@ int32_t sign_ecdsa(void* f, const void* private_key, const void* message, Extend
 import "C"
 import (
 	"fmt"
-	"github.com/alphaticks/go-starklib/trempoline"
+	"github.com/alphaticks/go-signlib/trempoline"
 	"math/big"
 	"unsafe"
 )
