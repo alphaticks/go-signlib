@@ -1,8 +1,8 @@
-# go-starklib
-Go wrapper around starknet-rs library for fast signing on STARK curve
+# go-signlib
+Go wrapper around different ECDSA signing libraries for faster signing
 
 ## Structure
-lib/starklib/src contains the Rust source of the library
+lib/sign/src contains the Rust source of the library
 
 ## Usage
 Use the makefile to build the library
