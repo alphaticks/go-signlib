@@ -19,7 +19,6 @@ int32_t sign_ed25519(const void* private_key, const void* message, ExtendedSigna
 import "C"
 import (
 	"fmt"
-	"github.com/alphaticks/go-signlib/trempoline"
 	"math/big"
 	"unsafe"
 )
@@ -44,7 +43,7 @@ func Load(path string) {
 }
 */
 
-func SignSTARKCGO(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
+func SignSTARK(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	/*
 		if signSTARKPtr == nil {
 			return nil, nil, fmt.Errorf("library not loaded")
@@ -68,6 +67,7 @@ func SignSTARKCGO(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	return
 }
 
+/*
 func SignSTARKBypass(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	if signSTARKPtr == nil {
 		return nil, nil, fmt.Errorf("library not loaded")
@@ -89,8 +89,9 @@ func SignSTARKBypass(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	//s = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
 	return
 }
+*/
 
-func SignEd25519CGO(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
+func SignEd25519(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	if signEd25519Ptr == nil {
 		return nil, nil, fmt.Errorf("library not loaded")
 	}
@@ -111,6 +112,8 @@ func SignEd25519CGO(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	//s = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
 	return
 }
+
+/*
 
 func SignEd25519Bypass(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	if signEd25519Ptr == nil {
@@ -133,3 +136,5 @@ func SignEd25519Bypass(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	//s = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
 	return
 }
+
+*/
