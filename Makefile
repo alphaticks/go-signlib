@@ -7,4 +7,7 @@ clean:
 library:
 	$(MAKE) -C lib/sign build
 
+install:
+	cp ./lib/sign/target/release/libsign.a /usr/lib
+
 all: library
