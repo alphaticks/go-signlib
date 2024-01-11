@@ -12,8 +12,8 @@ typedef struct {
 } SignatureC;
 
 
-int32_t sign_stark(const void* private_key, const void* message, ExtendedSignatureC* output);
-int32_t sign_ed25519(const void* private_key, const void* message, ExtendedSignatureC* output);
+int32_t sign_stark(const void* private_key, const void* message, SignatureC* output);
+int32_t sign_ed25519(const void* private_key, const void* message, SignatureC* output);
 
 */
 import "C"
@@ -49,7 +49,7 @@ func SignSTARK(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 			return nil, nil, fmt.Errorf("library not loaded")
 		}
 	*/
-	var signature C.ExtendedSignatureC
+	var signature C.SignatureC
 	var privKeyBytes, msgHashBytes [32]byte
 	privKey.FillBytes(privKeyBytes[:])
 	msgHash.FillBytes(msgHashBytes[:])
@@ -95,7 +95,7 @@ func SignEd25519(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	if signEd25519Ptr == nil {
 		return nil, nil, fmt.Errorf("library not loaded")
 	}
-	var signature C.ExtendedSignatureC
+	var signature C.SignatureC
 	var privKeyBytes, msgHashBytes [32]byte
 	privKey.FillBytes(privKeyBytes[:])
 	msgHash.FillBytes(msgHashBytes[:])
