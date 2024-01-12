@@ -1,7 +1,7 @@
 package ecdsa
 
 /*
-#cgo LDFLAGS: /usr/lib/libsign.a -lm -ldl
+#cgo LDFLAGS: -ldl
 #include <dlfcn.h>
 #include <stdint.h>
 
@@ -11,10 +11,13 @@ typedef struct {
     const void* s;
 } SignatureC;
 
+// Function pointer type for sign_ecdsa
+typedef int32_t (*sign_ecdsa_type)(const void*, const void*, SignatureC*);
 
-int32_t sign_stark(const void* private_key, const void* message, SignatureC* output);
-int32_t sign_ed25519(const void* private_key, const void* message, SignatureC* output);
-
+// Wrapper function to call sign_ecdsa
+int32_t sign_ecdsa(void* f, const void* private_key, const void* message, SignatureC* output) {
+    return ((sign_ecdsa_type) f)(private_key, message, output);
+}
 */
 import "C"
 import (
@@ -26,7 +29,6 @@ import (
 var signSTARKPtr unsafe.Pointer
 var signEd25519Ptr unsafe.Pointer
 
-/*
 func Load(path string) {
 	handle := C.dlopen(C.CString(path), C.RTLD_LAZY)
 	if handle == nil {
@@ -41,14 +43,11 @@ func Load(path string) {
 		panic("function sign_ed25519 not found in the library")
 	}
 }
-*/
 
 func SignSTARK(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
-	/*
-		if signSTARKPtr == nil {
-			return nil, nil, fmt.Errorf("library not loaded")
-		}
-	*/
+	if signSTARKPtr == nil {
+		return nil, nil, fmt.Errorf("library not loaded")
+	}
 	var signature C.SignatureC
 	var privKeyBytes, msgHashBytes [32]byte
 	privKey.FillBytes(privKeyBytes[:])
@@ -56,13 +55,14 @@ func SignSTARK(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	//fmt.Println(privKeyBytes)
 	//fmt.Println(fmt.Sprintf("%p, %p, %p, %p", signEcdsaPtr, unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), unsafe.Pointer(&signature)))
 	//res := trempoline.CallCFunc(uintptr(signEcdsaPtr), uintptr(unsafe.Pointer(&privKeyBytes[0])), uintptr(unsafe.Pointer(&msgHashBytes[0])), uintptr(unsafe.Pointer(&signature)))
-	res := C.sign_stark(unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), &signature)
+	res := C.sign_ecdsa(signSTARKPtr, unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), &signature)
 	if res == -1 {
 		return nil, nil, fmt.Errorf("invalid arguments")
 	} else if res == -2 {
 		return nil, nil, fmt.Errorf("invalid private key")
 	}
 	r = new(big.Int).SetBytes((*[32]byte)(signature.r)[:])
+	fmt.Println((*[32]byte)(signature.s)[:])
 	s = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
 	return
 }
@@ -102,7 +102,7 @@ func SignEd25519(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 	//fmt.Println(privKeyBytes)
 	//fmt.Println(fmt.Sprintf("%p, %p, %p, %p", signEcdsaPtr, unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), unsafe.Pointer(&signature)))
 	//res := trempoline.CallCFunc(uintptr(signEcdsaPtr), uintptr(unsafe.Pointer(&privKeyBytes[0])), uintptr(unsafe.Pointer(&msgHashBytes[0])), uintptr(unsafe.Pointer(&signature)))
-	res := C.sign_ed25519(unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), &signature)
+	res := C.sign_ecdsa(signEd25519Ptr, unsafe.Pointer(&privKeyBytes[0]), unsafe.Pointer(&msgHashBytes[0]), &signature)
 	if res == -1 {
 		return nil, nil, fmt.Errorf("invalid arguments")
 	} else if res == -2 {
