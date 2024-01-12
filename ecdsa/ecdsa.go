@@ -62,7 +62,6 @@ func SignSTARK(msgHash, privKey *big.Int) (r, s *big.Int, err error) {
 		return nil, nil, fmt.Errorf("invalid private key")
 	}
 	r = new(big.Int).SetBytes((*[32]byte)(signature.r)[:])
-	fmt.Println((*[32]byte)(signature.s)[:])
 	s = new(big.Int).SetBytes((*[32]byte)(signature.s)[:])
 	return
 }
