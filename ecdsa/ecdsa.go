@@ -46,7 +46,7 @@ var hashPedersenPtr unsafe.Pointer
 func Load(path string) {
 	handle := C.dlopen(C.CString(path), C.RTLD_LAZY)
 	if handle == nil {
-		err := C.dlerror()
+		err := C.GoString(C.dlerror())
 		panic(fmt.Sprintf("failed to load the library: %s %s", path, err))
 	}
 	signSTARKPtr = C.dlsym(handle, C.CString("sign_stark"))
