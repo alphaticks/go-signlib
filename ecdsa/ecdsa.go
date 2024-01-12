@@ -43,6 +43,10 @@ var signSTARKPtr unsafe.Pointer
 var signEd25519Ptr unsafe.Pointer
 var hashPedersenPtr unsafe.Pointer
 
+func Loaded() bool {
+	return signSTARKPtr != nil && signEd25519Ptr != nil && hashPedersenPtr != nil
+}
+
 func Load(path string) {
 	handle := C.dlopen(C.CString(path), C.RTLD_LAZY)
 	if handle == nil {
