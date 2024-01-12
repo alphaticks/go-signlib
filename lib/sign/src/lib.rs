@@ -16,7 +16,7 @@ pub struct SignatureC {
 
 #[repr(C)]
 pub struct HashC {
-    e: *const c_void, // or appropriate C type
+    e: [u8; 32], // or appropriate C type
 }
 
 #[no_mangle]
@@ -43,7 +43,7 @@ pub extern "C" fn hash_pedersen(
 
     // Populate the output structure
     unsafe {
-        (*output).e = fe_bytes.as_ptr() as *const c_void;
+        (*output).e.clone_from_slice(&fe_bytes);
     }
     0 // Success
 }

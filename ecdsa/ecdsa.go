@@ -12,7 +12,7 @@ typedef struct {
 } SignatureC;
 
 typedef struct {
-    const void* e;
+    uint8_t e[32];
 } HashC;
 
 
@@ -109,7 +109,8 @@ func HashPedersen(e0, e1 *big.Int) (e *big.Int, err error) {
 	} else if res == -2 {
 		return nil, fmt.Errorf("invalid private key")
 	}
-	e = new(big.Int).SetBytes((*[32]byte)(hash.e)[:])
+	eBytes := C.GoBytes(unsafe.Pointer(&hash.e[0]), 32)
+	e = new(big.Int).SetBytes(eBytes)
 	return
 }
 
