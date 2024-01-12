@@ -8,6 +8,6 @@ library:
 	$(MAKE) -C lib/sign build
 
 install:
-	cp ./lib/sign/target/release/libsign.a /usr/lib
+	cp ./lib/sign/target/release/libsign.so /usr/lib
 
 all: library

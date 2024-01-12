@@ -1,0 +1,11 @@
+[package]
+name = "sign"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+libc = "0.2.2"
+starknet = "0.6.0"
+ed25519-dalek = "2"
